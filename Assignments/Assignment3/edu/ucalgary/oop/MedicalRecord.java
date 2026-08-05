@@ -5,12 +5,12 @@ import java.time.LocalDate;
 public class MedicalRecord {
     private Location location;
     private String treatmentDetails;
-    private String dateOfTreatment;
+    private LocalDate dateOfTreatment;
 
-    public MedicalRecord(Location location, String treatmentDetails, String dateOfTreatment) {
+    public MedicalRecord(Location location, String treatmentDetails, LocalDate dateOfTreatment) {
         this.location = location;
         this.treatmentDetails = treatmentDetails;
-        this.dateOfTreatment = dateOfTreatment;
+        setDateOfTreatment(dateOfTreatment);
     }
 
     public Location getLocation() {
@@ -28,25 +28,18 @@ public class MedicalRecord {
     public void setTreatmentDetails(String treatmentDetails) {
         this.treatmentDetails = treatmentDetails;
     }
-    
 
-    public String getDateOfTreatment() {
+    public LocalDate getDateOfTreatment() {
         return dateOfTreatment;
     }
 
-    public void setDateOfTreatment(String dateOfTreatment) {
-        if (!isValidDateFormat(dateOfTreatment)) {
-            throw new IllegalArgumentException("Treatment was not given on \"" + dateOfTreatment + "\", that is not a real yyyy-MM-dd date");
+    public void setDateOfTreatment(LocalDate dateOfTreatment) {
+        if (dateOfTreatment == null) {
+            throw new IllegalArgumentException("A treatment needs a date, none was given");
+        }
+        if (dateOfTreatment.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Treatment cannot be recorded for " + dateOfTreatment + ", that day has not arrived");
         }
         this.dateOfTreatment = dateOfTreatment;
-    }
-
-    private boolean isValidDateFormat(String date) {
-        try {
-            LocalDate.parse(date);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 }

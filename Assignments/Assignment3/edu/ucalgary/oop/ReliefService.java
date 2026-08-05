@@ -5,11 +5,11 @@ import java.time.LocalDate;
 public class ReliefService {
     private Inquirer inquirer;
     private DisasterVictim missingPerson;
-    private String dateOfInquiry;
+    private LocalDate dateOfInquiry;
     private String infoProvided;
     private Location lastKnownLocation;
 
-    public ReliefService(Inquirer inquirer, DisasterVictim missingPerson, String dateOfInquiry,
+    public ReliefService(Inquirer inquirer, DisasterVictim missingPerson, LocalDate dateOfInquiry,
                          String infoProvided, Location lastKnownLocation) {
         this.inquirer = inquirer;
         this.missingPerson = missingPerson;
@@ -34,13 +34,16 @@ public class ReliefService {
         this.missingPerson = missingPerson;
     }
 
-    public String getDateOfInquiry() {
+    public LocalDate getDateOfInquiry() {
         return dateOfInquiry;
     }
 
-    public void setDateOfInquiry(String dateOfInquiry) {
-        if (!isValidDateFormat(dateOfInquiry)) {
-            throw new IllegalArgumentException("No inquiry could have been filed on \"" + dateOfInquiry + "\", check the yyyy-MM-dd format");
+    public void setDateOfInquiry(LocalDate dateOfInquiry) {
+        if (dateOfInquiry == null) {
+            throw new IllegalArgumentException("An inquiry needs a date, none was given");
+        }
+        if (dateOfInquiry.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("No inquiry could have been filed on " + dateOfInquiry + ", that day has not arrived");
         }
         this.dateOfInquiry = dateOfInquiry;
     }
@@ -59,15 +62,6 @@ public class ReliefService {
 
     public void setLastKnownLocation(Location lastKnownLocation) {
         this.lastKnownLocation = lastKnownLocation;
-    }
-
-    public boolean isValidDateFormat(String date) {
-        try {
-            LocalDate.parse(date);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     public String getLogDetails() {

@@ -9,20 +9,20 @@ public class DisasterVictim {
 
     private String firstName;
     private String lastName;
-    private String dateOfBirth;
+    private LocalDate dateOfBirth;
     private String gender;
     private String comments;
-    private final String ENTRY_DATE;
+    private final LocalDate ENTRY_DATE;
     private final int ASSIGNED_SOCIAL_ID;
     private FamilyRelation[] familyConnections = new FamilyRelation[0];
     private MedicalRecord[] medicalRecords = new MedicalRecord[0];
     private Supply[] personalBelongings = new Supply[0];
 
-    public DisasterVictim(String firstName, String entryDate) {
-        if (!isValidDateFormat(entryDate)) {
-            throw new IllegalArgumentException("Entry date \"" + entryDate + "\" is not a real date, use yyyy-MM-dd");
+    public DisasterVictim(String firstName, LocalDate entryDate) {
+        if (entryDate == null) {
+            throw new IllegalArgumentException("Every victim needs an entry date, none was given");
         }
-        if (convertDateStringToInt(entryDate) > convertDateStringToInt(LocalDate.now().toString())) {
+        if (entryDate.isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("Nobody can be logged as entering on " + entryDate + ", that day has not happened yet");
         }
         this.firstName = firstName;
@@ -30,7 +30,7 @@ public class DisasterVictim {
         this.ASSIGNED_SOCIAL_ID = generateSocialID();
     }
 
-    public DisasterVictim(String firstName, String entryDate, String dateOfBirth) {
+    public DisasterVictim(String firstName, LocalDate entryDate, LocalDate dateOfBirth) {
         this(firstName, entryDate);
         setDateOfBirth(dateOfBirth);
     }
@@ -51,15 +51,15 @@ public class DisasterVictim {
         this.lastName = lastName;
     }
 
-    public String getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(String dateOfBirth) {
-        if (!isValidDateFormat(dateOfBirth)) {
-            throw new IllegalArgumentException("Birthdays go in as yyyy-MM-dd, got \"" + dateOfBirth + "\"");
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        if (dateOfBirth == null) {
+            throw new IllegalArgumentException("A birthday cannot be left empty");
         }
-        if (convertDateStringToInt(dateOfBirth) > convertDateStringToInt(LocalDate.now().toString())) {
+        if (dateOfBirth.isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("Nobody is born on " + dateOfBirth + " yet, that date has not arrived");
         }
         this.dateOfBirth = dateOfBirth;
@@ -69,7 +69,7 @@ public class DisasterVictim {
         return ASSIGNED_SOCIAL_ID;
     }
 
-    public String getEntryDate() {
+    public LocalDate getEntryDate() {
         return ENTRY_DATE;
     }
 
@@ -150,18 +150,5 @@ public class DisasterVictim {
 
     private static int generateSocialID() {
         return counter++;
-    }
-
-    private boolean isValidDateFormat(String date) {
-        try {
-            LocalDate.parse(date);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private int convertDateStringToInt(String dateStr) {
-        return Integer.parseInt(dateStr.replace("-", ""));
     }
 }
