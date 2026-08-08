@@ -1,5 +1,6 @@
-//ENSF 380 Assignment 3 Group 5
+//ENSF 380 Assignment 3 Group 1
 // Muhammad Kazi, Ahmed Nasr, Rafee Chaudhry
+// java.time.LocalDate is used to check dates are real and to compare them, I hope thats okay!
 
 
 

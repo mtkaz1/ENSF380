@@ -1,4 +1,4 @@
-//ENSF 380 Assignment 3 Group 5
+//ENSF 380 Assignment 3 Group 1
 // Muhammad Kazi, Ahmed Nasr, Rafee Chaudhry
 
 package edu.ucalgary.oop;
