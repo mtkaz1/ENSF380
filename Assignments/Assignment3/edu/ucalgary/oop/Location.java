@@ -1,3 +1,6 @@
+//ENSF 380 Assignment 3 Group 5
+// Muhammad Kazi, Ahmed Nasr, Rafee Chaudhry
+
 package edu.ucalgary.oop;
 
 import java.util.ArrayList;
