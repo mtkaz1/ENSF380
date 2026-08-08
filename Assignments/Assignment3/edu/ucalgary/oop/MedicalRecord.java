@@ -5,9 +5,9 @@ import java.time.LocalDate;
 public class MedicalRecord {
     private Location location;
     private String treatmentDetails;
-    private LocalDate dateOfTreatment;
+    private String dateOfTreatment;
 
-    public MedicalRecord(Location location, String treatmentDetails, LocalDate dateOfTreatment) {
+    public MedicalRecord(Location location, String treatmentDetails, String dateOfTreatment) {
         this.location = location;
         this.treatmentDetails = treatmentDetails;
         setDateOfTreatment(dateOfTreatment);
@@ -29,17 +29,23 @@ public class MedicalRecord {
         this.treatmentDetails = treatmentDetails;
     }
 
-    public LocalDate getDateOfTreatment() {
+    public String getDateOfTreatment() {
         return dateOfTreatment;
     }
 
-    public void setDateOfTreatment(LocalDate dateOfTreatment) {
-        if (dateOfTreatment == null) {
-            throw new IllegalArgumentException("A treatment needs a date, none was given");
-        }
-        if (dateOfTreatment.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Treatment cannot be recorded for " + dateOfTreatment + ", that day has not arrived");
+    public void setDateOfTreatment(String dateOfTreatment) {
+        if (!isValidDateFormat(dateOfTreatment)) {
+            throw new IllegalArgumentException("Treatment was not given on \"" + dateOfTreatment + "\", that is not a real yyyy-mm-dd date");
         }
         this.dateOfTreatment = dateOfTreatment;
+    }
+
+    private boolean isValidDateFormat(String date) {
+        try {
+            LocalDate.parse(date);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

@@ -9,28 +9,28 @@ public class DisasterVictim {
 
     private String firstName;
     private String lastName;
-    private LocalDate dateOfBirth;
+    private String dateOfBirth;
     private String gender;
     private String comments;
-    private final LocalDate ENTRY_DATE;
+    private final String ENTRY_DATE;
     private final int ASSIGNED_SOCIAL_ID;
     private FamilyRelation[] familyConnections = new FamilyRelation[0];
     private MedicalRecord[] medicalRecords = new MedicalRecord[0];
     private Supply[] personalBelongings = new Supply[0];
 
-    public DisasterVictim(String firstName, LocalDate entryDate) {
-        if (entryDate == null) {
-            throw new IllegalArgumentException("Every victim needs an entry date, none was given");
+    public DisasterVictim(String firstName, String entryDate) {
+        if (!isValidDateFormat(entryDate)) {
+            throw new IllegalArgumentException("Entry date \"" + entryDate + "\" is not a real date, use yyyy-mm-dd");
         }
-        if (entryDate.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Nobody can be logged as entering on " + entryDate + ", that day has not happened yet");
+        if (convertDateStringToInt(entryDate) > convertDateStringToInt(LocalDate.now().toString())) {
+            throw new IllegalArgumentException("Invalid entry date " + entryDate + ", that's in the future");
         }
         this.firstName = firstName;
         this.ENTRY_DATE = entryDate;
         this.ASSIGNED_SOCIAL_ID = generateSocialID();
     }
 
-    public DisasterVictim(String firstName, LocalDate entryDate, LocalDate dateOfBirth) {
+    public DisasterVictim(String firstName, String entryDate, String dateOfBirth) {
         this(firstName, entryDate);
         setDateOfBirth(dateOfBirth);
     }
@@ -51,16 +51,16 @@ public class DisasterVictim {
         this.lastName = lastName;
     }
 
-    public LocalDate getDateOfBirth() {
+    public String getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        if (dateOfBirth == null) {
-            throw new IllegalArgumentException("A birthday cannot be left empty");
+    public void setDateOfBirth(String dateOfBirth) {
+        if (!isValidDateFormat(dateOfBirth)) {
+            throw new IllegalArgumentException("Birthdays go in as yyyy-mm-dd, got \"" + dateOfBirth + "\"");
         }
-        if (dateOfBirth.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Nobody is born on " + dateOfBirth + " yet, that date has not arrived");
+        if (convertDateStringToInt(dateOfBirth) > convertDateStringToInt(ENTRY_DATE)) {
+            throw new IllegalArgumentException(firstName + " cannot be born on " + dateOfBirth + ", that is after the entry date " + ENTRY_DATE);
         }
         this.dateOfBirth = dateOfBirth;
     }
@@ -69,7 +69,7 @@ public class DisasterVictim {
         return ASSIGNED_SOCIAL_ID;
     }
 
-    public LocalDate getEntryDate() {
+    public String getEntryDate() {
         return ENTRY_DATE;
     }
 
@@ -86,11 +86,10 @@ public class DisasterVictim {
     }
 
     public void setGender(String gender) {
-        if (gender == null || !Arrays.asList("man", "woman", "boy", "girl", "please specify")
-                .contains(gender.toLowerCase())) {
-            throw new IllegalArgumentException("\"" + gender + "\" is not on the gender list: man, woman, boy, girl, please specify");
+        if (gender == null || gender.trim().isEmpty()) {
+            throw new IllegalArgumentException("Gender cannot be left blank");
         }
-        this.gender = gender;
+        this.gender = gender.trim().toLowerCase();
     }
 
     public FamilyRelation[] getFamilyConnections() {
@@ -109,7 +108,7 @@ public class DisasterVictim {
     public void removeFamilyConnection(FamilyRelation exRelation) {
         ArrayList<FamilyRelation> remaining = new ArrayList<>(Arrays.asList(familyConnections));
         if (!remaining.remove(exRelation)) {
-            throw new IllegalArgumentException("That relation was never linked to " + firstName + ", nothing to unlink");
+            throw new IllegalArgumentException("That relation was never connected to " + firstName + "");
         }
         familyConnections = remaining.toArray(new FamilyRelation[0]);
     }
@@ -143,12 +142,25 @@ public class DisasterVictim {
     public void removePersonalBelonging(Supply unwantedSupply) {
         ArrayList<Supply> remaining = new ArrayList<>(Arrays.asList(personalBelongings));
         if (!remaining.remove(unwantedSupply)) {
-            throw new IllegalArgumentException(firstName + " is not carrying that supply");
+            throw new IllegalArgumentException(firstName + " doesn't have the supply");
         }
         personalBelongings = remaining.toArray(new Supply[0]);
     }
 
     private static int generateSocialID() {
         return counter++;
+    }
+
+    private boolean isValidDateFormat(String date) {
+        try {
+            LocalDate.parse(date);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private int convertDateStringToInt(String dateStr) {
+        return Integer.parseInt(dateStr.replace("-", ""));
     }
 }

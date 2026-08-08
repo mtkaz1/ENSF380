@@ -7,7 +7,7 @@ public class FamilyRelation {
 
     public FamilyRelation(DisasterVictim personOne, String relationshipTo, DisasterVictim personTwo) {
         if (personOne == null || relationshipTo == null || personTwo == null) {
-            throw new IllegalArgumentException("A family relation takes two people and how they are related");
+            throw new IllegalArgumentException("A family relation needs two people and the relationship between them");
         }
         this.personOne = personOne;
         this.relationshipTo = relationshipTo;

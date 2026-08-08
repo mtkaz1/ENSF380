@@ -26,7 +26,7 @@ public class Supply {
 
     public void setQuantity(int quantity) {
         if (quantity < 0) {
-            throw new IllegalArgumentException("You cannot have " + quantity + " of " + type + ", stock never goes below zero");
+            throw new IllegalArgumentException("You can't have negative supplies");
         }
         this.quantity = quantity;
     }
