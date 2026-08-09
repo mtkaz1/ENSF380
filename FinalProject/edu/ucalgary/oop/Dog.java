@@ -28,6 +28,7 @@ public class Dog extends Pet {
 
     /** Returns a short dog description. */
     public String toString() {
-        return super.toString() + " - Vaccinated: " + (vaccinated ? "Yes" : "No");
+        return super.toString() + " - Vaccinated: "
+            + (vaccinated ? "Yes" : "No");
     }
 }

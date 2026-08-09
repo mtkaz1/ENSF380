@@ -11,11 +11,12 @@ import java.util.ArrayList;
 
 /** Loads and changes clinic data with JDBC. */
 public class DatabaseManager {
-    private static final String URL = "jdbc:postgresql://localhost:5432/vet_clinic";
+    private static final String URL =
+        "jdbc:postgresql://localhost:5432/vet_clinic";
     private static final String USERNAME = "oop";
     private static final String PASSWORD = "ucalgary";
 
-    /** Opens a database connection. */
+    // Opens a database connection.
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USERNAME, PASSWORD);
     }
@@ -82,7 +83,8 @@ public class DatabaseManager {
     }
 
     /** Loads all pets and connects them to owners. */
-    public ArrayList<Pet> loadPets(ArrayList<Owner> owners) throws SQLException {
+    public ArrayList<Pet> loadPets(ArrayList<Owner> owners)
+                                   throws SQLException {
         ArrayList<Pet> pets = new ArrayList<>();
         Connection connection = null;
         PreparedStatement statement = null;
@@ -91,7 +93,8 @@ public class DatabaseManager {
         try {
             connection = getConnection();
             statement = connection.prepareStatement(
-                "SELECT id, name, age, species, owner_id, is_vaccinated, is_indoor "
+                "SELECT id, name, age, species, owner_id, "
+                    + "is_vaccinated, is_indoor "
                     + "FROM pets ORDER BY id"
             );
             results = statement.executeQuery();
@@ -156,6 +159,21 @@ public class DatabaseManager {
         return appointments;
     }
 
+    /** Inserts a veterinarian and returns its new ID. */
+    public int insertVeterinarian(String name, String specialization)
+                                  throws SQLException {
+        String sql = "INSERT INTO staff (name, role, specialization) "
+            + "VALUES (?, 'Vet', ?) RETURNING id";
+        return insertStaff(sql, name, specialization);
+    }
+
+    /** Inserts a receptionist and returns its new ID. */
+    public int insertReceptionist(String name) throws SQLException {
+        String sql = "INSERT INTO staff (name, role, specialization) "
+            + "VALUES (?, 'Receptionist', NULL) RETURNING id";
+        return insertStaff(sql, name, null);
+    }
+
     /** Inserts an owner and returns its new ID. */
     public int insertOwner(String name, String phone, String email)
                            throws SQLException {
@@ -200,7 +218,8 @@ public class DatabaseManager {
     /** Inserts an appointment and returns its new ID. */
     public int insertAppointment(int petId, int vetId, LocalDateTime dateTime,
                                  String notes) throws SQLException {
-        String sql = "INSERT INTO appointments (pet_id, vet_id, date_time, notes) "
+        String sql = "INSERT INTO appointments "
+            + "(pet_id, vet_id, date_time, notes) "
             + "VALUES (?, ?, ?, ?) RETURNING id";
         Connection connection = null;
         PreparedStatement statement = null;
@@ -238,7 +257,58 @@ public class DatabaseManager {
         }
     }
 
-    /** Inserts a pet shared by dog and cat methods. */
+    /** Deletes a staff member. */
+    public boolean deleteStaff(int staffId) throws SQLException {
+        Connection connection = null;
+        PreparedStatement statement = null;
+
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(
+                "DELETE FROM staff WHERE id = ?"
+            );
+            statement.setInt(1, staffId);
+            return statement.executeUpdate() == 1;
+        } finally {
+            closeResources(null, statement, connection);
+        }
+    }
+
+    /** Deletes a pet. */
+    public boolean deletePet(int petId) throws SQLException {
+        Connection connection = null;
+        PreparedStatement statement = null;
+
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(
+                "DELETE FROM pets WHERE id = ?"
+            );
+            statement.setInt(1, petId);
+            return statement.executeUpdate() == 1;
+        } finally {
+            closeResources(null, statement, connection);
+        }
+    }
+
+    /** Deletes an owner. */
+    public boolean deleteOwner(int ownerId) throws SQLException {
+        Connection connection = null;
+        PreparedStatement statement = null;
+
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(
+                "DELETE FROM owners WHERE id = ?"
+            );
+            statement.setInt(1, ownerId);
+            return statement.executeUpdate() == 1;
+        } finally {
+            closeResources(null, statement, connection);
+        }
+    }
+
+    // Inserts a pet shared by dog and cat methods.
     private int insertPet(String sql, String name, int age, int ownerId,
                           boolean specialValue) throws SQLException {
         Connection connection = null;
@@ -260,8 +330,31 @@ public class DatabaseManager {
         }
     }
 
-    /** Finds an owner by ID. */
-    private Owner findOwner(ArrayList<Owner> owners, int id) throws SQLException {
+    // Inserts a staff member shared by both staff types.
+    private int insertStaff(String sql, String name, String specialization)
+                            throws SQLException {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet results = null;
+
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setString(1, name);
+            if (specialization != null) {
+                statement.setString(2, specialization);
+            }
+            results = statement.executeQuery();
+            results.next();
+            return results.getInt("id");
+        } finally {
+            closeResources(results, statement, connection);
+        }
+    }
+
+    // Finds an owner by ID.
+    private Owner findOwner(ArrayList<Owner> owners, int id)
+                            throws SQLException {
         for (Owner owner : owners) {
             if (owner.getId() == id) {
                 return owner;
@@ -270,7 +363,7 @@ public class DatabaseManager {
         throw new SQLException("Owner " + id + " was not found");
     }
 
-    /** Finds a pet by ID. */
+    // Finds a pet by ID.
     private Pet findPet(ArrayList<Pet> pets, int id) throws SQLException {
         for (Pet pet : pets) {
             if (pet.getId() == id) {
@@ -280,18 +373,18 @@ public class DatabaseManager {
         throw new SQLException("Pet " + id + " was not found");
     }
 
-    /** Finds a veterinarian by ID. */
+    // Finds a veterinarian by ID.
     private Veterinarian findVeterinarian(ArrayList<Staff> staff, int id)
                                           throws SQLException {
         for (Staff member : staff) {
-            if (member.getId() == id && member instanceof Veterinarian) {
+            if (member.getId() == id && member.getRole().equals("Vet")) {
                 return (Veterinarian) member;
             }
         }
         throw new SQLException("Veterinarian " + id + " was not found");
     }
 
-    /** Closes JDBC resources. */
+    // Closes JDBC resources.
     private void closeResources(ResultSet results, PreparedStatement statement,
                                 Connection connection) throws SQLException {
         if (results != null) {

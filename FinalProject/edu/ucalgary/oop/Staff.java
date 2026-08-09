@@ -10,7 +10,9 @@ public abstract class Staff implements Identifiable {
     /** Creates a staff member. */
     public Staff(int id, String name) {
         if (id <= 0 || name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Staff needs a valid ID and name");
+            throw new IllegalArgumentException(
+                "Staff needs a valid ID and name"
+            );
         }
         this.id = id;
         this.name = name.trim();
@@ -41,6 +43,13 @@ public abstract class Staff implements Identifiable {
     /** Returns the number of staff objects. */
     public static int getStaffCount() {
         return staffCount;
+    }
+
+    /** Decreases the staff count after deletion. */
+    public static void decreaseStaffCount() {
+        if (staffCount > 0) {
+            staffCount--;
+        }
     }
 
     /** Returns a short staff description. */

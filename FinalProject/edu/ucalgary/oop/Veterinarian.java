@@ -24,7 +24,9 @@ public class Veterinarian extends Staff {
     /** Changes the area of expertise. */
     public void setSpecialization(String specialization) {
         if (specialization == null || specialization.trim().isEmpty()) {
-            throw new IllegalArgumentException("A veterinarian needs a specialization");
+            throw new IllegalArgumentException(
+                "A veterinarian needs a specialization"
+            );
         }
         this.specialization = specialization.trim();
     }

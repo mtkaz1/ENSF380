@@ -1,28 +1,20 @@
 package edu.ucalgary.oop;
 
-import java.awt.EventQueue;
 import java.sql.SQLException;
-
-import javax.swing.JOptionPane;
 
 /** Starts the veterinary clinic program. */
 public class Main {
-    /** Loads the database and opens the GUI. */
+    /** Loads the database and starts the command-line interface. */
     public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            try {
-                DatabaseManager database = new DatabaseManager();
-                Clinic clinic = new Clinic(database);
-                ClinicGUI gui = new ClinicGUI(clinic);
-                gui.showGUI();
-            } catch (SQLException exception) {
-                JOptionPane.showMessageDialog(
-                    null,
-                    "Could not connect to the database:\n" + exception.getMessage(),
-                    "Database Error",
-                    JOptionPane.ERROR_MESSAGE
-                );
-            }
-        });
+        try {
+            DatabaseManager database = new DatabaseManager();
+            Clinic clinic = new Clinic(database);
+            ClinicCLI cli = new ClinicCLI(clinic);
+            cli.run();
+        } catch (SQLException exception) {
+            System.out.println(
+                "Could not connect to the database: " + exception.getMessage()
+            );
+        }
     }
 }

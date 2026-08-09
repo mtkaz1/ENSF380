@@ -1,13 +1,9 @@
 package edu.ucalgary.oop;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /** Represents a veterinary appointment. */
 public class Appointment implements Identifiable {
-    private static final DateTimeFormatter DISPLAY_FORMAT =
-        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
     private final int id;
     private final Pet pet;
     private final Veterinarian veterinarian;
@@ -17,8 +13,11 @@ public class Appointment implements Identifiable {
     /** Creates an appointment. */
     public Appointment(int id, Pet pet, Veterinarian veterinarian,
                        LocalDateTime dateTime, String notes) {
-        if (id <= 0 || pet == null || veterinarian == null || dateTime == null) {
-            throw new IllegalArgumentException("Appointment information is incomplete");
+        if (id <= 0 || pet == null || veterinarian == null
+                || dateTime == null) {
+            throw new IllegalArgumentException(
+                "Appointment information is incomplete"
+            );
         }
         this.id = id;
         this.pet = pet;
@@ -59,7 +58,7 @@ public class Appointment implements Identifiable {
 
     /** Returns a short appointment description. */
     public String toString() {
-        return id + " - " + dateTime.format(DISPLAY_FORMAT) + " - "
+        return id + " - " + dateTime.toString().replace("T", " ") + " - "
             + pet.getName() + " with " + veterinarian.getName();
     }
 }

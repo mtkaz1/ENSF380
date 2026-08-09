@@ -81,9 +81,21 @@ public class Owner implements Identifiable {
         pets.add(pet);
     }
 
+    /** Removes a pet from the owner. */
+    public void removePet(Pet pet) {
+        pets.remove(pet);
+    }
+
     /** Returns the number of owner objects. */
     public static int getOwnerCount() {
         return ownerCount;
+    }
+
+    /** Decreases the owner count after deletion. */
+    public static void decreaseOwnerCount() {
+        if (ownerCount > 0) {
+            ownerCount--;
+        }
     }
 
     /** Returns a short owner description. */

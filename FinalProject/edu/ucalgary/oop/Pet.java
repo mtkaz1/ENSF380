@@ -10,7 +10,9 @@ public abstract class Pet implements Identifiable {
     /** Creates a pet. */
     public Pet(int id, String name, int age, Owner owner) {
         if (id <= 0 || owner == null) {
-            throw new IllegalArgumentException("Pet needs a valid ID and owner");
+            throw new IllegalArgumentException(
+                "Pet needs a valid ID and owner"
+            );
         }
         this.id = id;
         this.owner = owner;
