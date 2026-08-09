@@ -1,5 +1,7 @@
 package edu.ucalgary.oop;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,17 +10,44 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /** Loads and changes clinic data with JDBC. */
 public class DatabaseManager {
-    private static final String URL =
-        "jdbc:postgresql://localhost:5432/vet_clinic";
-    private static final String USERNAME = "oop";
-    private static final String PASSWORD = "ucalgary";
+    private final String url;
+    private final String username;
+    private final String password;
+
+    /** Loads the database settings from db.properties. */
+    public DatabaseManager() throws FileNotFoundException {
+        Scanner configFile = new Scanner(new File("db.properties"));
+        url = readSetting(configFile);
+        username = readSetting(configFile);
+        password = readSetting(configFile);
+        configFile.close();
+    }
 
     // Opens a database connection.
     private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        return DriverManager.getConnection(url, username, password);
+    }
+
+    // Reads the value after an equals sign.
+    private String readSetting(Scanner configFile) {
+        if (!configFile.hasNextLine()) {
+            throw new IllegalArgumentException(
+                "db.properties is missing a database setting"
+            );
+        }
+
+        String line = configFile.nextLine();
+        int equalsPosition = line.indexOf('=');
+        if (equalsPosition < 0) {
+            throw new IllegalArgumentException(
+                "Each db.properties line needs an equals sign"
+            );
+        }
+        return line.substring(equalsPosition + 1).trim();
     }
 
     /** Loads all staff members. */
