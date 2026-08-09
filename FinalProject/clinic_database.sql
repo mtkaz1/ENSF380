@@ -4,10 +4,10 @@
 
 -- 1) Create the database (run from a superuser or a user with createdb)
 -- If you're already inside the target DB, you can skip this and the \c line.
-CREATE DATABASE vet_clinic;
+-- CREATE DATABASE vet_clinic;
 
 -- 2) Connect to the database (psql command)
-\c vet_clinic
+-- -- \c vet_clinic
 
 -- (Optional) Create a dedicated schema
 CREATE SCHEMA IF NOT EXISTS public;
