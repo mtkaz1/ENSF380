@@ -21,6 +21,22 @@ public class MainTest {
         pet = clinic.getPets().get(0);
     }
 
+    private String runCli(String... inputLines) {
+        String input = String.join("\n", inputLines) + "\n";
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+
+        PrintStream originalOut = System.out;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            System.setOut(new PrintStream(out));
+            new ClinicCLI(clinic).run();
+        } finally {
+            System.setOut(originalOut);
+        }
+        return out.toString();
+
+    }
+
     @Test
     public void testScheduleAndCancelAppointment() throws Exception {
         LocalDateTime future = LocalDateTime.now().plusDays(30).withMinute(0).withSecond(0).withNano(0);
@@ -68,39 +84,21 @@ public class MainTest {
     @Test
     public void testEnteringNonexistantPet() {
         // menu choice, bad pet id, then exit
-        String input = String.join("\n", "11", "1000", "0") + "\n";
-        System.setIn(new ByteArrayInputStream(input.getBytes()));
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(out));
-
-        new ClinicCLI(clinic).run();
-        System.setOut(System.out);
-        assertTrue(out.toString().contains("Pet was not found"));
+        String output = runCli("11", "1000", "0");
+        assertTrue(output.contains("Pet was not found"));
     }
 
     @Test
     public void testEnteringNonexistantVet() {
         // menu choice, valid pet id, bad vet id, then exit
-        String input = String.join("\n", "11", "1", "1000", "0") + "\n";
-        System.setIn(new ByteArrayInputStream(input.getBytes()));
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(out));
-
-        new ClinicCLI(clinic).run();
-        System.setOut(System.out);
-        assertTrue(out.toString().contains("Veterinarian was not found"));
+        String output = runCli("11", "1", "1000", "0");
+        assertTrue(output.contains("Veterinarian was not found"));
     }
 
     @Test
     public void testEnteringGarbageDate() {
         // menu choice, valid pet id, valid vet id, garbage date, then exit
-        String input = String.join("\n", "11", "1", "1", "wawawawawa", "0") + "\n";
-        System.setIn(new ByteArrayInputStream(input.getBytes()));
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(out));
-
-        new ClinicCLI(clinic).run();
-        System.setOut(System.out);
-        assertTrue(out.toString().contains("Use date format yyyy-mm-dd hh:mm"));
+        String output = runCli("11", "1", "1", "wawawawawa", "0");
+        assertTrue(output.contains("Use date format yyyy-mm-dd hh:mm"));
     }
 }
