@@ -2,49 +2,52 @@
 
 This program uses JDBC to connect to PostgreSQL. The connection settings are
 stored in `db.properties` so the database name, username, or password can be
-changed without modifying the Java code.
+changed without modifying the Java code just to make it easier for our professor or TA to mark! We use gitbash as our terminal for most things, so the directions are provided for it. Powershell and zsh are incredibly similar too.
 
 ## Database Setup
 
-The PostgreSQL role `oop` must use the password `ucalgary`. If the role does
-not exist, create it while logged in as `postgres`:
+Log in as `postgres`, then run:
 
 ```sql
-CREATE ROLE oop WITH LOGIN CREATEDB PASSWORD 'ucalgary';
+CREATE ROLE oop WITH LOGIN PASSWORD 'ucalgary';
+CREATE DATABASE vet_clinic OWNER oop;
 ```
 
-If `oop` already exists but cannot create databases, an administrator can
-run:
-
-```sql
-ALTER ROLE oop CREATEDB;
-```
-
-Then run the supplied SQL file as `oop` from the `FinalProject` folder:
+Then to load the tables with our sql files data we run:
 
 ```bash
-psql -U oop -d postgres -f clinic_database.sql
+psql -U oop -d vet_clinic -f clinic_database.sql
 ```
 
-The file creates `vet_clinic`, connects to it, and creates the clinic tables
-and starting records. Run it only once on a fresh PostgreSQL installation.
+Run the SQL file only once, otherwise it can cause duplicates to show. Java then connects using `db.properties` for ease of connection.
 
 ## Compile and Run
 
-From the `FinalProject` folder in Git Bash (Or you can modify for another terminal):
+To compile and run the project:
 
 ```bash
+mkdir -p bin ##this is just so the .Class files don't flood our folder
 javac -cp "lib/*" -d bin edu/ucalgary/oop/*.java
 java -cp "bin;lib/*" edu.ucalgary.oop.Main
 ```
 
-To run the JUnit tests after compiling:
+To run the Junit tests:
 
 ```bash
 java -cp "bin;lib/*" org.junit.runner.JUnitCore edu.ucalgary.oop.AppointmentTest
 ```
 
+
 ## Menu Options
+
+
+A CLI approach was chosen for the users use, as well as clean, simple aesthetics.
+
+<figure align="center">
+  <img src="images/cli.png" alt="Paws & Care CLI example">
+  <figcaption>Figure 1: Paws & Care Veterinary Clinic CLI</figcaption>
+</figure>
+
 
 Enter a menu number and press Enter:
 
