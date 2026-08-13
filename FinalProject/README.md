@@ -34,8 +34,14 @@ and starting records. Run it only once on a fresh PostgreSQL installation.
 From the `FinalProject` folder in Git Bash (Or you can modify for another terminal):
 
 ```bash
-javac -cp "lib/postgresql-42.7.13.jar" -d bin edu/ucalgary/oop/*.java
-java -cp "bin;lib/postgresql-42.7.13.jar" edu.ucalgary.oop.Main
+javac -cp "lib/*" -d bin edu/ucalgary/oop/*.java
+java -cp "bin;lib/*" edu.ucalgary.oop.Main
+```
+
+To run the JUnit tests after compiling:
+
+```bash
+java -cp "bin;lib/*" org.junit.runner.JUnitCore edu.ucalgary.oop.AppointmentTest
 ```
 
 ## Menu Options

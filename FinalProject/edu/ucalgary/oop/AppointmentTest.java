@@ -152,7 +152,7 @@ public class AppointmentTest {
 
     @Test
     public void testToStringReturnsExpectedFormat() {
-        LocalDateTime dateTime = LocalDateTime.of(2026, 1, 1, 0, 0);;
+        LocalDateTime dateTime = LocalDateTime.of(2026, 1, 1, 0, 0);
         Appointment appointment = new Appointment(
             105, pet, vet, dateTime, "Checkup"
         );
@@ -204,7 +204,7 @@ public class AppointmentTest {
     }
 
     @Test
-    public void testSequenialBookings() throws Exception {
+    public void testSequentialBookings() throws Exception {
         setUpClinic();
         LocalDateTime t1 = LocalDateTime.now().plusDays(30)
                                         .withHour(0)
@@ -278,7 +278,7 @@ public class AppointmentTest {
     }
 
     @Test
-    public void testEnteringNonexistantPet() throws Exception {
+    public void testEnteringNonexistentPet() throws Exception {
         setUpClinic();
         // menu choice, bad pet id, then exit
         String output = runCli("11", "1000", "0");
@@ -286,7 +286,7 @@ public class AppointmentTest {
     }
 
     @Test
-    public void testEnteringNonexistantVet() throws Exception {
+    public void testEnteringNonexistentVet() throws Exception {
         setUpClinic();
         // menu choice, valid pet id, bad vet id, then exit
         String output = runCli("11", "1", "1000", "0");
