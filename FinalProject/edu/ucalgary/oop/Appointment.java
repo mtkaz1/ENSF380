@@ -61,4 +61,5 @@ public class Appointment implements Identifiable {
         return id + " - " + dateTime.toString().replace("T", " ") + " - "
             + pet.getName() + " with " + veterinarian.getName();
     }
+
 }
