@@ -5,8 +5,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-/** Stores clinic data and applies clinic rules. */
+/** Manages clinic data in memory and saves changes to the database. */
 public class Clinic {
+    /** Maximum appointments allowed for one veterinarian in one day. This can be set to the users choosing. */
     public static final int MAX_DAILY_APPOINTMENTS = 8;
 
     private final DatabaseManager database;
@@ -15,11 +16,17 @@ public class Clinic {
     private final ArrayList<Pet> pets;
     private final ArrayList<Appointment> appointments;
 
-    /** Loads the clinic from the database. */
+    /**
+     * Loads all clinic data from the database.
+     *
+     * @param database the database manager to use
+     * @throws SQLException if clinic data cannot be loaded
+     * @throws IllegalArgumentException if  the database manager is null
+     */
     public Clinic(DatabaseManager database) throws SQLException {
         if (database == null) {
             throw new IllegalArgumentException(
-                "Database manager cannot be null"
+                "Database manager can't be null"
             );
         }
         this.database = database;
@@ -29,27 +36,47 @@ public class Clinic {
         appointments = database.loadAppointments(pets, staff);
     }
 
-    /** Returns all staff members. */
+    /**
+     * Returns all staff members stored in memory.
+     *
+     * @return the staff members
+     */
     public ArrayList<Staff> getStaff() {
         return staff;
     }
 
-    /** Returns all owners. */
+    /**
+     * Returns all owners stored in memory.
+     *
+     * @return the owners
+     */
     public ArrayList<Owner> getOwners() {
         return owners;
     }
 
-    /** Returns all pets. */
+    /**
+     * Returns all pets stored in memory.
+     *
+     * @return the pets
+     */
     public ArrayList<Pet> getPets() {
         return pets;
     }
 
-    /** Returns all appointments. */
+    /**
+     * Returns all appointments stored in memory.
+     *
+     * @return the appointments
+     */
     public ArrayList<Appointment> getAppointments() {
         return appointments;
     }
 
-    /** Returns all veterinarians. */
+    /**
+     * Returns all veterinarians stored in memory.
+     *
+     * @return the veterinarians
+     */
     public ArrayList<Veterinarian> getVeterinarians() {
         ArrayList<Veterinarian> veterinarians = new ArrayList<>();
         for (Staff member : staff) {
@@ -60,7 +87,15 @@ public class Clinic {
         return veterinarians;
     }
 
-    /** Registers and stores a veterinarian. */
+    /**
+     * Registers a veterinarian in memory and in the database.
+     *
+     * @param name the veterinarian's name
+     * @param specialization the veterinarian's area of expertise
+     * @return the registered veterinarian
+     * @throws SQLException if the veterinarian cannot be stored
+     * @throws IllegalArgumentException if the information is invalid
+     */
     public Veterinarian registerVeterinarian(String name, String specialization)
                                                throws SQLException {
         validateName(name, "Staff name");
@@ -75,7 +110,14 @@ public class Clinic {
         return veterinarian;
     }
 
-    /** Registers and stores a receptionist. */
+    /**
+     * Registers a receptionist in memory and in the database.
+     *
+     * @param name the receptionist's name
+     * @return the registered receptionist
+     * @throws SQLException if the receptionist cannot be stored
+     * @throws IllegalArgumentException if the name is invalid
+     */
     public Receptionist registerReceptionist(String name) throws SQLException {
         validateName(name, "Staff name");
         int id = database.insertReceptionist(name.trim());
@@ -84,7 +126,16 @@ public class Clinic {
         return receptionist;
     }
 
-    /** Registers and stores an owner. */
+    /**
+     * Registers an owner in memory and in the database.
+     *
+     * @param name the owner's name
+     * @param phone the owner's phone number
+     * @param email the owner's email address
+     * @return the registered owner
+     * @throws SQLException if the owner cannot be stored
+     * @throws IllegalArgumentException if the information is invalid
+     */
     public Owner registerOwner(String name, String phone, String email)
                                throws SQLException {
         validateName(name, "Owner name");
@@ -105,7 +156,17 @@ public class Clinic {
         return owner;
     }
 
-    /** Registers and stores a dog. */
+    /**
+     * Registers a dog in memory and in the database.
+     *
+     * @param name the dog's name
+     * @param age the dog's age
+     * @param owner the dog's owner
+     * @param vaccinated whether the dog is vaccinated
+     * @return the registered dog
+     * @throws SQLException if the dog cannot be stored
+     * @throws IllegalArgumentException if the information is invalid
+     */
     public Dog registerDog(String name, int age, Owner owner,
                            boolean vaccinated)
                            throws SQLException {
@@ -119,7 +180,17 @@ public class Clinic {
         return dog;
     }
 
-    /** Registers and stores a cat. */
+    /**
+     * Registers a cat in memory and in the database.
+     *
+     * @param name the cat's name
+     * @param age the cat's age
+     * @param owner the cat's owner
+     * @param indoor whether the cat is an indoor cat
+     * @return the registered cat
+     * @throws SQLException if the cat cannot be stored
+     * @throws IllegalArgumentException if the information is invalid
+     */
     public Cat registerCat(String name, int age, Owner owner, boolean indoor)
                            throws SQLException {
         validatePet(name, age, owner);
@@ -130,7 +201,19 @@ public class Clinic {
         return cat;
     }
 
-    /** Schedules and stores an appointment. */
+    /**
+     * Schedules an appointment in memory and in the database.
+     *
+     * @param pet the pet receiving care
+     * @param veterinarian the veterinarian assigned to the appointment
+     * @param dateTime the appointment date and time
+     * @param notes additional appointment notes
+     * @return the scheduled appointment
+     * @throws SQLException if the appointment cannot be stored
+     * @throws AppointmentConflictException if the veterinarian is booked
+     * @throws DailyAppointmentLimitException if the daily limit is reached
+     * @throws IllegalArgumentException if the information is invalid
+     */
     public Appointment scheduleAppointment(Pet pet, Veterinarian veterinarian,
                                            LocalDateTime dateTime, String notes)
                                            throws SQLException,
@@ -183,7 +266,13 @@ public class Clinic {
         return appointment;
     }
 
-    /** Cancels an appointment. */
+    /**
+     * Removes an appointment from memory and the database.
+     *
+     * @param appointment the appointment to cancel
+     * @throws SQLException if the appointment cannot be deleted
+     * @throws IllegalArgumentException if the appointment is not found
+     */
     public void cancelAppointment(Appointment appointment) throws SQLException {
         if (appointment == null) {
             throw new IllegalArgumentException(
@@ -196,7 +285,13 @@ public class Clinic {
         appointments.remove(appointment);
     }
 
-    /** Deletes a staff member and their appointments. */
+    /**
+     * Deletes a staff member and their appointments.
+     *
+     * @param member the staff member to delete
+     * @throws SQLException if the staff member cannot be deleted
+     * @throws IllegalArgumentException if the staff member is not found
+     */
     public void deleteStaff(Staff member) throws SQLException {
         if (member == null) {
             throw new IllegalArgumentException(
@@ -219,7 +314,13 @@ public class Clinic {
         Staff.decreaseStaffCount();
     }
 
-    /** Deletes a pet and its appointments. */
+    /**
+     * Deletes a pet and its appointments.
+     *
+     * @param pet the pet to delete
+     * @throws SQLException if the pet cannot be deleted
+     * @throws IllegalArgumentException if the pet is not found
+     */
     public void deletePet(Pet pet) throws SQLException {
         if (pet == null) {
             throw new IllegalArgumentException("Select a pet to delete");
@@ -237,7 +338,13 @@ public class Clinic {
         pets.remove(pet);
     }
 
-    /** Deletes an owner, their pets, and their appointments. */
+    /**
+     * Deletes an owner, their pets, and their appointments.
+     *
+     * @param owner the owner to delete
+     * @throws SQLException if the owner cannot be deleted
+     * @throws IllegalArgumentException if the owner is not found
+     */
     public void deleteOwner(Owner owner) throws SQLException {
         if (owner == null) {
             throw new IllegalArgumentException("Select an owner to delete");

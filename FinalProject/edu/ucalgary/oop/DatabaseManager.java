@@ -12,13 +12,18 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-/** Loads and changes clinic data with JDBC. */
+/** Loads and changes PostgreSQL clinic data using JDBC. */
 public class DatabaseManager {
     private final String url;
     private final String username;
     private final String password;
 
-    /** Loads the database settings from db.properties. */
+    /**
+     * Loads the database settings from {@code db.properties}.
+     *
+     * @throws FileNotFoundException if {@code db.properties} is missing
+     * @throws IllegalArgumentException if a database setting is invalid
+     */
     public DatabaseManager() throws FileNotFoundException {
         Scanner configFile = new Scanner(new File("db.properties"));
         url = readSetting(configFile);
@@ -50,7 +55,12 @@ public class DatabaseManager {
         return line.substring(equalsPosition + 1).trim();
     }
 
-    /** Loads all staff members. */
+    /**
+     * Loads all staff members from the database.
+     *
+     * @return the loaded staff members
+     * @throws SQLException if the data cannot be loaded
+     */
     public ArrayList<Staff> loadStaff() throws SQLException {
         ArrayList<Staff> staff = new ArrayList<>();
         Connection connection = null;
@@ -83,7 +93,12 @@ public class DatabaseManager {
         return staff;
     }
 
-    /** Loads all owners. */
+    /**
+     * Loads all owners from the database.
+     *
+     * @return the loaded owners
+     * @throws SQLException if the data cannot be loaded
+     */
     public ArrayList<Owner> loadOwners() throws SQLException {
         ArrayList<Owner> owners = new ArrayList<>();
         Connection connection = null;
@@ -111,7 +126,13 @@ public class DatabaseManager {
         return owners;
     }
 
-    /** Loads all pets and connects them to owners. */
+    /**
+     * Loads all pets and connects each pet to its owner.
+     *
+     * @param owners the owners already loaded from the database
+     * @return the loaded pets
+     * @throws SQLException if the data or an owner cannot be found
+     */
     public ArrayList<Pet> loadPets(ArrayList<Owner> owners)
                                    throws SQLException {
         ArrayList<Pet> pets = new ArrayList<>();
@@ -154,7 +175,14 @@ public class DatabaseManager {
         return pets;
     }
 
-    /** Loads all appointments and connects their objects. */
+    /**
+     * Loads all appointments and connects their pets and veterinarians.
+     *
+     * @param pets the pets already loaded from the database
+     * @param staff the staff already loaded from the database
+     * @return the loaded appointments
+     * @throws SQLException if the data or a related object cannot be found
+     */
     public ArrayList<Appointment> loadAppointments(ArrayList<Pet> pets,
                                                     ArrayList<Staff> staff)
                                                     throws SQLException {
@@ -188,7 +216,14 @@ public class DatabaseManager {
         return appointments;
     }
 
-    /** Inserts a veterinarian and returns its new ID. */
+    /**
+     * Inserts a veterinarian into the database.
+     *
+     * @param name the veterinarian's name
+     * @param specialization the veterinarian's specialization
+     * @return the new database ID
+     * @throws SQLException if the veterinarian cannot be added
+     */
     public int insertVeterinarian(String name, String specialization)
                                   throws SQLException {
         String sql = "INSERT INTO staff (name, role, specialization) "
@@ -196,14 +231,28 @@ public class DatabaseManager {
         return insertStaff(sql, name, specialization);
     }
 
-    /** Inserts a receptionist and returns its new ID. */
+    /**
+     * Inserts a receptionist into the database.
+     *
+     * @param name the receptionist's name
+     * @return the new database ID
+     * @throws SQLException if the receptionist cannot be added
+     */
     public int insertReceptionist(String name) throws SQLException {
         String sql = "INSERT INTO staff (name, role, specialization) "
             + "VALUES (?, 'Receptionist', NULL) RETURNING id";
         return insertStaff(sql, name, null);
     }
 
-    /** Inserts an owner and returns its new ID. */
+    /**
+     * Inserts an owner into the database.
+     *
+     * @param name the owner's name
+     * @param phone the owner's phone number
+     * @param email the owner's email address
+     * @return the new database ID
+     * @throws SQLException if the owner cannot be added
+     */
     public int insertOwner(String name, String phone, String email)
                            throws SQLException {
         String sql = "INSERT INTO owners (name, phone, email) "
@@ -226,7 +275,16 @@ public class DatabaseManager {
         }
     }
 
-    /** Inserts a dog and returns its new ID. */
+    /**
+     * Inserts a dog into the database.
+     *
+     * @param name the dog's name
+     * @param age the dog's age
+     * @param ownerId the owner's database ID
+     * @param vaccinated whether the dog is vaccinated
+     * @return the new database ID
+     * @throws SQLException if the dog cannot be added
+     */
     public int insertDog(String name, int age, int ownerId, boolean vaccinated)
                          throws SQLException {
         String sql = "INSERT INTO pets "
@@ -235,7 +293,16 @@ public class DatabaseManager {
         return insertPet(sql, name, age, ownerId, vaccinated);
     }
 
-    /** Inserts a cat and returns its new ID. */
+    /**
+     * Inserts a cat into the database.
+     *
+     * @param name the cat's name
+     * @param age the cat's age
+     * @param ownerId the owner's database ID
+     * @param indoor whether the cat is an indoor cat
+     * @return the new database ID
+     * @throws SQLException if the cat cannot be added
+     */
     public int insertCat(String name, int age, int ownerId, boolean indoor)
                          throws SQLException {
         String sql = "INSERT INTO pets "
@@ -244,7 +311,16 @@ public class DatabaseManager {
         return insertPet(sql, name, age, ownerId, indoor);
     }
 
-    /** Inserts an appointment and returns its new ID. */
+    /**
+     * Inserts an appointment into the database.
+     *
+     * @param petId the pet's database ID
+     * @param vetId the veterinarian's database ID
+     * @param dateTime the appointment date and time
+     * @param notes additional appointment notes
+     * @return the new database ID
+     * @throws SQLException if the appointment cannot be added
+     */
     public int insertAppointment(int petId, int vetId, LocalDateTime dateTime,
                                  String notes) throws SQLException {
         String sql = "INSERT INTO appointments "
@@ -269,7 +345,13 @@ public class DatabaseManager {
         }
     }
 
-    /** Deletes an appointment. */
+    /**
+     * Deletes an appointment from the database.
+     *
+     * @param appointmentId the appointment ID
+     * @return {@code true} if an appointment was deleted
+     * @throws SQLException if the delete operation fails
+     */
     public boolean deleteAppointment(int appointmentId) throws SQLException {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -286,7 +368,13 @@ public class DatabaseManager {
         }
     }
 
-    /** Deletes a staff member. */
+    /**
+     * Deletes a staff member from the database.
+     *
+     * @param staffId the staff member's ID
+     * @return {@code true} if a staff member was deleted
+     * @throws SQLException if the delete operation fails
+     */
     public boolean deleteStaff(int staffId) throws SQLException {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -303,7 +391,13 @@ public class DatabaseManager {
         }
     }
 
-    /** Deletes a pet. */
+    /**
+     * Deletes a pet from the database.
+     *
+     * @param petId the pet's ID
+     * @return {@code true} if a pet was deleted
+     * @throws SQLException if the delete operation fails
+     */
     public boolean deletePet(int petId) throws SQLException {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -320,7 +414,13 @@ public class DatabaseManager {
         }
     }
 
-    /** Deletes an owner. */
+    /**
+     * Deletes an owner from the database.
+     *
+     * @param ownerId the owner's ID
+     * @return {@code true} if an owner was deleted
+     * @throws SQLException if the delete operation fails
+     */
     public boolean deleteOwner(int ownerId) throws SQLException {
         Connection connection = null;
         PreparedStatement statement = null;

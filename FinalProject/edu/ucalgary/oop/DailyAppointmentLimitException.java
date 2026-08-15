@@ -1,8 +1,12 @@
 package edu.ucalgary.oop;
 
-/** Reports a veterinarian's full schedule. */
+/** Reports that a veterinarian has reached the daily appointment limit. */
 public class DailyAppointmentLimitException extends Exception {
-    /** Creates the exception. */
+    /**
+     * Creates an exception with an explanation of the limit.
+     *
+     * @param message the error message
+     */
     public DailyAppointmentLimitException(String message) {
         super(message);
     }

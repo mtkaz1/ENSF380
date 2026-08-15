@@ -4,12 +4,17 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 
-/** Provides a simple command-line interface for the clinic. */
+/** Provides the command-line menus for managing the clinic. */
 public class ClinicCLI {
     private final Clinic clinic;
     private final Scanner scanner;
 
-    /** Creates the clinic command-line interface. */
+    /**
+     * Creates a command-line interface for a clinic.
+     *
+     * @param clinic the clinic to manage
+     * @throws IllegalArgumentException if {@code clinic} is {@code null}
+     */
     public ClinicCLI(Clinic clinic) {
         if (clinic == null) {
             throw new IllegalArgumentException("Clinic cannot be null");
@@ -18,7 +23,7 @@ public class ClinicCLI {
         scanner = new Scanner(System.in);
     }
 
-    /** Runs the program until the user chooses to exit. */
+    /** Runs the clinic menu until the user chooses to exit. */
     public void run() {
         boolean running = true;
         System.out.println("\nPaws & Care Veterinary Clinic");

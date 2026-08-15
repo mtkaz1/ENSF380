@@ -1,13 +1,19 @@
 package edu.ucalgary.oop;
 
-/** Stores information shared by all staff members. */
+/** Stores information shared by veterinarians and receptionists. */
 public abstract class Staff implements Identifiable {
     private static int staffCount = 0;
 
     private final int id;
     private String name;
 
-    /** Creates a staff member. */
+    /**
+     * Creates a staff member.
+     *
+     * @param id the database ID
+     * @param name the staff member's name
+     * @throws IllegalArgumentException if the ID or name is invalid
+     */
     public Staff(int id, String name) {
         if (id <= 0 || name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException(
@@ -19,17 +25,30 @@ public abstract class Staff implements Identifiable {
         staffCount++;
     }
 
-    /** Returns the staff ID. */
+    /**
+     * Returns the staff ID.
+     *
+     * @return the staff ID
+     */
     public int getId() {
         return id;
     }
 
-    /** Returns the staff name. */
+    /**
+     * Returns the staff member's name.
+     *
+     * @return the staff member's name
+     */
     public String getName() {
         return name;
     }
 
-    /** Changes the staff name. */
+    /**
+     * Changes the staff member's name.
+     *
+     * @param name the new name
+     * @throws IllegalArgumentException if the name is blank
+     */
     public void setName(String name) {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Staff name cannot be blank");
@@ -37,10 +56,18 @@ public abstract class Staff implements Identifiable {
         this.name = name.trim();
     }
 
-    /** Returns the permanent staff role. */
+    /**
+     * Returns the staff member's role.
+     *
+     * @return the staff role
+     */
     public abstract String getRole();
 
-    /** Returns the number of staff objects. */
+    /**
+     * Returns the number of staff objects.
+     *
+     * @return the staff count
+     */
     public static int getStaffCount() {
         return staffCount;
     }
@@ -52,7 +79,11 @@ public abstract class Staff implements Identifiable {
         }
     }
 
-    /** Returns a short staff description. */
+    /**
+     * Returns a short staff description.
+     *
+     * @return the staff description
+     */
     public String toString() {
         return id + " - " + name + " (" + getRole() + ")";
     }

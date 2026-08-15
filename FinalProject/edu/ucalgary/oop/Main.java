@@ -3,9 +3,13 @@ package edu.ucalgary.oop;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 
-/** Starts the veterinary clinic program. */
+/** Starts the Paws &amp; Care Veterinary Clinic program. */
 public class Main {
-    /** Loads the database and starts the command-line interface. */
+    /**
+     * Loads the database and starts the command-line interface.
+     *
+     * @param args command-line arguments; not used
+     */
     public static void main(String[] args) {
         try {
             DatabaseManager database = new DatabaseManager();

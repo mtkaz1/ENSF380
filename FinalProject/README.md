@@ -29,6 +29,7 @@ To compile and run the project:
 mkdir -p bin ##this is just so the .Class files don't flood our folder
 javac -cp "lib/*" -d bin edu/ucalgary/oop/*.java
 java -cp "bin;lib/*" edu.ucalgary.oop.Main
+javadocs -d docs/javadoc -cp "lib/*" edu/ucalgary/oop/*.java 
 ```
 
 To run the Junit tests:
